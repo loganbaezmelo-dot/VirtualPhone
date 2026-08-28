@@ -371,13 +371,12 @@
   <div class="phone-wrapper" id="phoneWrapper">
     <div class="status-bar">
       <span id="statusClock">12:00</span>
-      <span id="statusBattery">5G 📶 98%</span>
+      <span id="statusBattery">5G 📶 100%</span>
     </div>
 
     <div class="viewport" id="viewport">
       <div class="pages-slider" id="slider">
         
-        <!-- Home Screen -->
         <div class="page" id="pageHome">
           <div class="clock-widget">
             <div class="time" id="homeClock">12:00</div>
@@ -404,13 +403,12 @@
           </div>
         </div>
 
-        <!-- Feed Screen -->
         <div class="page" id="pageFeed">
           <div class="feed-container">
             <h3 style="margin-bottom: 12px;">News Feed</h3>
             <div class="feed-card">
               <h4>🔥 Hardware Status</h4>
-              All device modules and full viewport bounds are operational.
+              All device modules and battery power systems are operational.
             </div>
             <div class="feed-card">
               <h4>📸 Dual Camera Active</h4>
@@ -431,7 +429,6 @@
       </div>
     </div>
 
-    <!-- Active App Modal -->
     <div class="app-view" id="appView">
       <div class="app-header" id="appTitle">App Name</div>
       <div class="app-content" id="appContent"></div>
@@ -458,6 +455,34 @@
     }
     updateClocks();
     setInterval(updateClocks, 1000);
+
+    // --- Dynamic Battery Drain System ---
+    let batteryLevel = parseInt(localStorage.getItem('phone_battery') || '100', 10);
+
+    function updateBatteryDisplay() {
+      const batEl = document.getElementById('statusBattery');
+      if (batteryLevel <= 10) {
+        batEl.textContent = `🪫 ${batteryLevel}%`;
+        batEl.style.color = '#ef4444'; // Red
+      } else if (batteryLevel <= 20) {
+        batEl.textContent = `🪫 ${batteryLevel}%`;
+        batEl.style.color = '#f59e0b'; // Yellow
+      } else {
+        batEl.textContent = `5G 📶 ${batteryLevel}%`;
+        batEl.style.color = '#fff';
+      }
+      localStorage.setItem('phone_battery', batteryLevel.toString());
+    }
+
+    updateBatteryDisplay();
+
+    // Drains 1% every 25 seconds
+    setInterval(() => {
+      if (batteryLevel > 1) {
+        batteryLevel--;
+        updateBatteryDisplay();
+      }
+    }, 25000);
 
     let currentPage = 0;
     const slider = document.getElementById('slider');
@@ -499,7 +524,7 @@
     const appContent = document.getElementById('appContent');
     let isAppOpen = false;
     let cameraStream = null;
-    let currentFacingMode = "user"; // "user" (front) or "environment" (back)
+    let currentFacingMode = "user";
 
     function openAppContainer(title, htmlContent) {
       appTitle.textContent = title;
@@ -541,7 +566,6 @@
         const video = document.getElementById('cameraVideo');
         if (video) video.srcObject = cameraStream;
       } catch (err) {
-        // Fallback without exact constraint if device only has one camera
         try {
           cameraStream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: currentFacingMode },
@@ -667,11 +691,8 @@
           </select>
         </div>
         <div class="setting-group">
-          <span>Battery Saver</span>
-          <select onchange="toggleBatterySaver(this.value)">
-            <option value="off">Off (100%)</option>
-            <option value="on">On (20% Low Power)</option>
-          </select>
+          <span>Recharge Battery</span>
+          <button class="btn-action" style="margin: 0; padding: 6px 12px;" onclick="rechargeBattery()">⚡ Charge to 100%</button>
         </div>
         <div class="setting-group">
           <span>Storage</span>
@@ -681,21 +702,15 @@
       openAppContainer('Settings', html);
     }
 
+    function rechargeBattery() {
+      batteryLevel = 100;
+      updateBatteryDisplay();
+    }
+
     function changeTheme(themeClass) {
       document.body.className = '';
       if (themeClass !== 'default') {
         document.body.classList.add(themeClass);
-      }
-    }
-
-    function toggleBatterySaver(val) {
-      const batEl = document.getElementById('statusBattery');
-      if (val === 'on') {
-        batEl.textContent = '🪫 20%';
-        batEl.style.color = '#f59e0b';
-      } else {
-        batEl.textContent = '5G 📶 98%';
-        batEl.style.color = '#fff';
       }
     }
   </script>
