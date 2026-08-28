@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Virtual Smartphone Simulator</title>
   <style>
     * {
@@ -18,48 +18,56 @@
     body {
       background: #0f1115;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
       color: #fff;
     }
 
-    /* Fixed Aspect Ratio Phone Shell */
+    /* Fullscreen Adaptive OS Shell */
     .phone-wrapper {
-      width: 340px;
-      height: 680px;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      max-width: 100%;
       background: #181a20;
-      border-radius: 44px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), inset 0 0 0 4px #2b2e38;
+      border-radius: 0;
+      box-shadow: none;
       position: relative;
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
     }
 
     /* Status Bar & Notch */
     .status-bar {
-      height: 40px;
+      height: 48px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 0 24px;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
       z-index: 50;
       position: relative;
+      flex-shrink: 0;
     }
 
     .punch-hole {
       position: absolute;
       left: 50%;
-      top: 10px;
+      top: 14px;
       transform: translateX(-50%);
       width: 14px;
       height: 14px;
       background: #000;
       border-radius: 50%;
+      display: none; /* Hidden on full phone displays */
     }
 
     /* Viewport Area */
@@ -67,6 +75,7 @@
       flex: 1;
       position: relative;
       overflow: hidden;
+      width: 100%;
     }
 
     .pages-slider {
@@ -81,38 +90,42 @@
       height: 100%;
       display: flex;
       flex-direction: column;
-      padding: 20px;
+      padding: 16px 24px 60px;
       position: relative;
+      overflow: hidden;
     }
 
     /* Page 1: Home Screen */
     .clock-widget {
       text-align: center;
-      margin-top: 20px;
-      margin-bottom: 30px;
+      margin-top: 10px;
+      margin-bottom: 24px;
     }
     .clock-widget .time {
-      font-size: 48px;
+      font-size: clamp(48px, 12vw, 72px);
       font-weight: 300;
       letter-spacing: -1px;
     }
     .clock-widget .date {
-      font-size: 14px;
+      font-size: clamp(14px, 3.5vw, 18px);
       color: #9aa0a6;
       margin-top: 4px;
     }
 
     .app-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-      padding: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 16px;
+      padding: 10px 0;
+      max-width: 600px;
+      margin: 0 auto;
+      width: 100%;
     }
 
     .app-icon {
       background: #232732;
-      border-radius: 20px;
-      padding: 16px;
+      border-radius: 24px;
+      padding: 18px 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -127,7 +140,7 @@
       background: #2d3240;
     }
     .app-icon .icon-emoji {
-      font-size: 32px;
+      font-size: 34px;
     }
     .app-icon span {
       font-size: 13px;
@@ -138,7 +151,10 @@
     .feed-container {
       height: 100%;
       overflow-y: auto;
-      padding-bottom: 40px;
+      padding-bottom: 60px;
+      max-width: 600px;
+      margin: 0 auto;
+      width: 100%;
       touch-action: pan-y;
     }
     .feed-container::-webkit-scrollbar {
@@ -146,38 +162,40 @@
     }
     .feed-card {
       background: #232732;
-      padding: 16px;
-      border-radius: 16px;
-      margin-bottom: 12px;
+      padding: 18px;
+      border-radius: 18px;
+      margin-bottom: 14px;
       font-size: 14px;
-      line-height: 1.4;
+      line-height: 1.5;
     }
     .feed-card h4 {
       margin-bottom: 6px;
       color: #60a5fa;
+      font-size: 16px;
     }
 
     /* Pagination Dots */
     .page-dots {
       position: absolute;
-      bottom: 25px;
+      bottom: 45px;
       left: 0;
       right: 0;
       display: flex;
       justify-content: center;
-      gap: 6px;
+      gap: 8px;
       z-index: 10;
+      pointer-events: none;
     }
     .dot {
-      width: 7px;
-      height: 7px;
+      width: 8px;
+      height: 8px;
       background: rgba(255, 255, 255, 0.3);
       border-radius: 50%;
       transition: 0.3s;
     }
     .dot.active {
       background: #fff;
-      width: 18px;
+      width: 22px;
       border-radius: 8px;
     }
 
@@ -189,7 +207,7 @@
       z-index: 100;
       display: flex;
       flex-direction: column;
-      padding: 50px 20px 20px;
+      padding: 60px 24px 40px;
       transform: translateY(100%);
       transition: transform 0.35s cubic-bezier(0.1, 0.9, 0.2, 1);
     }
@@ -197,23 +215,24 @@
       transform: translateY(0);
     }
     .app-view-header {
-      font-size: 20px;
+      font-size: 24px;
       font-weight: 700;
       margin-bottom: 20px;
     }
     .app-view-body {
       flex: 1;
-      font-size: 14px;
+      font-size: 15px;
       color: #c4c7c5;
+      line-height: 1.6;
     }
 
-    /* Bottom Home Indicator Bar (Swipe Up Area) */
+    /* Bottom Home Gesture Bar */
     .gesture-bar-area {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
-      height: 35px;
+      height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -221,11 +240,28 @@
       cursor: pointer;
     }
     .gesture-bar {
-      width: 120px;
+      width: 130px;
       height: 5px;
       background: rgba(255, 255, 255, 0.7);
       border-radius: 10px;
       transition: transform 0.2s;
+    }
+
+    /* Desktop fallback frame if viewed on a large monitor */
+    @media (min-width: 600px) {
+      body {
+        background: #090a0d;
+      }
+      .phone-wrapper {
+        width: 390px;
+        height: 844px;
+        max-height: 92vh;
+        border-radius: 46px;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), inset 0 0 0 3px #2b2e38;
+      }
+      .punch-hole {
+        display: block;
+      }
     }
   </style>
 </head>
@@ -274,7 +310,7 @@
         <!-- Page 2: News / Scrollable Feed -->
         <div class="page" id="pageFeed">
           <div class="feed-container" id="feedScroll">
-            <h3 style="margin-bottom: 12px;">News Feed</h3>
+            <h3 style="margin-bottom: 14px;">News Feed</h3>
             <div class="feed-card">
               <h4>🔥 High Refresh Rates</h4>
               Why 30fps feels choppy once your eyes adjust to 120Hz scrolling physics.
@@ -362,10 +398,9 @@
       const diffX = touchStartX - e.changedTouches[0].clientX;
       const diffY = touchStartY - e.changedTouches[0].clientY;
 
-      // Only trigger horizontal page swipe if horizontal drag > vertical scroll
       if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
-        if (diffX > 0 && currentPage === 0) goToPage(1); // Swipe Left
-        else if (diffX < 0 && currentPage === 1) goToPage(0); // Swipe Right
+        if (diffX > 0 && currentPage === 0) goToPage(1);
+        else if (diffX < 0 && currentPage === 1) goToPage(0);
       }
     });
 
@@ -401,19 +436,18 @@
 
     gestureBar.addEventListener('touchend', (e) => {
       const diffY = barStartY - e.changedTouches[0].clientY;
-      if (diffY > 20) { // Dragged up
+      if (diffY > 20) {
         closeAppToHome();
       }
     });
 
-    // Also let users swipe up anywhere from inside the open app
     appView.addEventListener('touchstart', (e) => {
       barStartY = e.touches[0].clientY;
     }, { passive: true });
 
     appView.addEventListener('touchend', (e) => {
       const diffY = barStartY - e.changedTouches[0].clientY;
-      if (diffY > 60) { // Upward flick inside app
+      if (diffY > 60) {
         closeAppToHome();
       }
     });
