@@ -13,7 +13,6 @@
       --subtext-color: #9aa0a6;
     }
 
-    /* Theme Presets */
     body.theme-oled {
       --bg-color: #000000;
       --card-bg: #121212;
@@ -35,21 +34,18 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    body {
-      background: #090a0d;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100vw;
-      height: 100vh;
+    html, body {
+      width: 100%;
+      height: 100%;
       height: 100dvh;
       overflow: hidden;
+      background: var(--bg-color);
       color: var(--text-color);
     }
 
     .phone-wrapper {
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       height: 100dvh;
       background: var(--bg-color);
       position: relative;
@@ -58,32 +54,19 @@
       flex-direction: column;
       padding-top: env(safe-area-inset-top, 0px);
       padding-bottom: env(safe-area-inset-bottom, 0px);
-      transition: background 0.3s ease;
     }
 
     /* Status Bar */
     .status-bar {
-      height: 44px;
+      height: 40px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 24px;
+      padding: 0 16px;
       font-size: 13px;
       font-weight: 600;
       z-index: 50;
       flex-shrink: 0;
-    }
-
-    .punch-hole {
-      position: absolute;
-      left: 50%;
-      top: 12px;
-      transform: translateX(-50%);
-      width: 12px;
-      height: 12px;
-      background: #000;
-      border-radius: 50%;
-      display: none;
     }
 
     .viewport {
@@ -105,77 +88,72 @@
       height: 100%;
       display: flex;
       flex-direction: column;
-      padding: 16px 20px 60px;
+      padding: 10px 16px 50px;
       position: relative;
+      overflow-y: auto;
     }
 
     /* Home Screen */
     .clock-widget {
       text-align: center;
-      margin-top: 10px;
-      margin-bottom: 24px;
+      margin-top: 5px;
+      margin-bottom: 20px;
     }
     .clock-widget .time {
-      font-size: clamp(48px, 12vw, 68px);
+      font-size: clamp(40px, 10vw, 64px);
       font-weight: 300;
       letter-spacing: -1px;
     }
     .clock-widget .date {
-      font-size: 15px;
+      font-size: 14px;
       color: var(--subtext-color);
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
     .app-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 16px;
-      max-width: 500px;
-      margin: 0 auto;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
       width: 100%;
     }
 
     .app-icon {
       background: var(--card-bg);
-      border-radius: 22px;
-      padding: 16px 10px;
+      border-radius: 20px;
+      padding: 16px 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-      transition: transform 0.15s ease, background-color 0.2s;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
     }
     .app-icon:active {
-      transform: scale(0.92);
+      transform: scale(0.95);
     }
     .app-icon .icon-emoji {
-      font-size: 32px;
+      font-size: 30px;
     }
     .app-icon span {
       font-size: 13px;
       font-weight: 500;
     }
 
-    /* Page 2: Feed */
+    /* Feed Screen */
     .feed-container {
       height: 100%;
       overflow-y: auto;
-      padding-bottom: 60px;
-      max-width: 500px;
-      margin: 0 auto;
-      width: 100%;
+      padding-bottom: 50px;
     }
     .feed-container::-webkit-scrollbar { display: none; }
     .feed-card {
       background: var(--card-bg);
-      padding: 16px;
-      border-radius: 16px;
-      margin-bottom: 12px;
+      padding: 14px;
+      border-radius: 14px;
+      margin-bottom: 10px;
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.4;
     }
     .feed-card h4 {
       margin-bottom: 4px;
@@ -184,7 +162,7 @@
 
     .page-dots {
       position: absolute;
-      bottom: 45px;
+      bottom: 35px;
       left: 0;
       right: 0;
       display: flex;
@@ -194,19 +172,19 @@
       pointer-events: none;
     }
     .dot {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       background: rgba(255, 255, 255, 0.3);
       border-radius: 50%;
       transition: 0.3s;
     }
     .dot.active {
       background: #fff;
-      width: 20px;
+      width: 18px;
       border-radius: 8px;
     }
 
-    /* Full App Modal Screen */
+    /* Modal / Running App View */
     .app-view {
       position: absolute;
       inset: 0;
@@ -215,52 +193,33 @@
       display: flex;
       flex-direction: column;
       transform: translateY(100%);
-      transition: transform 0.35s cubic-bezier(0.1, 0.9, 0.2, 1);
-      padding: 50px 20px 40px;
-      overflow-y: auto;
+      transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
+      padding: 40px 16px 40px;
     }
     .app-view.open {
       transform: translateY(0);
     }
     .app-header {
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 700;
-      margin-bottom: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      margin-bottom: 12px;
+      flex-shrink: 0;
     }
     .app-content {
       flex: 1;
       display: flex;
       flex-direction: column;
+      min-height: 0;
+      overflow-y: auto;
     }
 
-    /* Bottom Home Indicator Bar */
-    .gesture-bar-area {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 38px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 200;
-      cursor: pointer;
-    }
-    .gesture-bar {
-      width: 125px;
-      height: 5px;
-      background: rgba(255, 255, 255, 0.7);
-      border-radius: 10px;
-    }
-
-    /* --- App 1: Camera UI --- */
+    /* Camera View Adjustments */
     .camera-box {
       flex: 1;
+      width: 100%;
+      min-height: 0;
       background: #000;
-      border-radius: 20px;
+      border-radius: 16px;
       overflow: hidden;
       position: relative;
       display: flex;
@@ -274,67 +233,71 @@
     }
     .camera-controls {
       display: flex;
-      justify-content: space-around;
+      justify-content: center;
       align-items: center;
-      padding: 20px 0 10px;
+      padding: 12px 0 0;
+      flex-shrink: 0;
     }
     .shutter-btn {
-      width: 65px;
-      height: 65px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       background: #fff;
-      border: 5px solid rgba(255, 255, 255, 0.4);
+      border: 4px solid rgba(255, 255, 255, 0.4);
       cursor: pointer;
     }
     .shutter-btn:active { transform: scale(0.9); }
 
-    /* --- App 2: Gallery / Photos UI --- */
+    /* Gallery */
     .gallery-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
+      gap: 6px;
+      overflow-y: auto;
     }
     .gallery-item {
       aspect-ratio: 1;
-      border-radius: 12px;
+      border-radius: 10px;
       object-fit: cover;
       width: 100%;
       background: var(--card-bg);
     }
 
-    /* --- App 3: Notes UI --- */
+    /* Notes */
     .note-input {
       width: 100%;
       background: var(--card-bg);
       border: none;
       color: #fff;
-      padding: 12px;
-      border-radius: 12px;
-      font-size: 15px;
-      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-bottom: 8px;
       outline: none;
+      flex-shrink: 0;
     }
     .btn-action {
       background: var(--accent-color);
       color: #000;
       border: none;
-      padding: 10px 16px;
-      border-radius: 10px;
+      padding: 8px 14px;
+      border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
       align-self: flex-start;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
     }
     .notes-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       overflow-y: auto;
     }
     .note-item {
       background: var(--card-bg);
-      padding: 12px 16px;
-      border-radius: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -344,15 +307,14 @@
       color: #ef4444;
       cursor: pointer;
       font-weight: bold;
-      padding: 4px 8px;
     }
 
-    /* --- App 4: Settings UI --- */
+    /* Settings */
     .setting-group {
       background: var(--card-bg);
-      border-radius: 16px;
-      padding: 14px 16px;
-      margin-bottom: 12px;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -361,34 +323,40 @@
       background: var(--bg-color);
       color: #fff;
       border: none;
-      padding: 6px 10px;
-      border-radius: 8px;
+      padding: 4px 8px;
+      border-radius: 6px;
       outline: none;
     }
 
-    @media (min-width: 600px) {
-      .phone-wrapper {
-        width: 390px;
-        height: 844px;
-        max-height: 92vh;
-        border-radius: 46px;
-        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), inset 0 0 0 3px #2b2e38;
-      }
-      .punch-hole { display: block; }
+    /* Gesture Home Bar */
+    .gesture-bar-area {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      cursor: pointer;
+    }
+    .gesture-bar {
+      width: 100px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
 
   <div class="phone-wrapper" id="phoneWrapper">
-    <div class="punch-hole"></div>
-
     <div class="status-bar">
       <span id="statusClock">12:00</span>
       <span id="statusBattery">5G 📶 98%</span>
     </div>
 
-    <!-- Main Swappable Viewport -->
     <div class="viewport" id="viewport">
       <div class="pages-slider" id="slider">
         
@@ -419,21 +387,21 @@
           </div>
         </div>
 
-        <!-- News / Feed -->
+        <!-- Feed Screen -->
         <div class="page" id="pageFeed">
           <div class="feed-container">
-            <h3 style="margin-bottom: 14px;">Today's Feed</h3>
+            <h3 style="margin-bottom: 12px;">News Feed</h3>
             <div class="feed-card">
               <h4>🔥 Hardware Status</h4>
-              All device modules and internal storage states are operational.
+              All device modules and full viewport bounds are operational.
             </div>
             <div class="feed-card">
-              <h4>📸 Camera Ready</h4>
-              Snap real snapshots and view them saved directly in the Photos gallery.
+              <h4>📸 Live Camera</h4>
+              Snap photos with native screen fitting.
             </div>
             <div class="feed-card">
-              <h4>📝 Live Notes</h4>
-              Add quick reminders with instant local persistence.
+              <h4>📝 Storage Persistent</h4>
+              Notes and gallery are stored locally.
             </div>
           </div>
         </div>
@@ -446,13 +414,12 @@
       </div>
     </div>
 
-    <!-- App View Containers -->
+    <!-- Active App Modal -->
     <div class="app-view" id="appView">
       <div class="app-header" id="appTitle">App Name</div>
       <div class="app-content" id="appContent"></div>
     </div>
 
-    <!-- Swipe Up / Tap Home Gesture Bar -->
     <div class="gesture-bar-area" id="homeGestureBar">
       <div class="gesture-bar"></div>
     </div>
@@ -461,7 +428,6 @@
   <canvas id="photoCanvas" style="display: none;"></canvas>
 
   <script>
-    // Realtime Clock Updater
     function updateClocks() {
       const now = new Date();
       let hours = now.getHours();
@@ -476,7 +442,6 @@
     updateClocks();
     setInterval(updateClocks, 1000);
 
-    // Page Slider Navigation
     let currentPage = 0;
     const slider = document.getElementById('slider');
     const dot0 = document.getElementById('dot0');
@@ -512,7 +477,6 @@
       }
     });
 
-    // App Open / Close Core
     const appView = document.getElementById('appView');
     const appTitle = document.getElementById('appTitle');
     const appContent = document.getElementById('appContent');
@@ -537,7 +501,6 @@
       }
     }
 
-    // Gesture Handlers
     const gestureBar = document.getElementById('homeGestureBar');
     let barStartY = 0;
     gestureBar.addEventListener('click', closeAppToHome);
@@ -546,10 +509,8 @@
       if (barStartY - e.changedTouches[0].clientY > 20) closeAppToHome();
     });
 
-    // Shared Photos State
     let photosGallery = JSON.parse(localStorage.getItem('phone_photos') || '[]');
 
-    // --- 1. Functional Camera App ---
     async function openCameraApp() {
       const html = `
         <div class="camera-box">
@@ -569,7 +530,7 @@
         document.getElementById('cameraVideo').srcObject = cameraStream;
       } catch (err) {
         document.getElementById('appContent').innerHTML = `
-          <div style="text-align:center; margin-top: 40px; color:#ef4444;">
+          <div style="text-align:center; margin-top: 30px; color:#ef4444;">
             <p>📷 Camera access not granted or unavailable.</p>
           </div>
         `;
@@ -590,18 +551,16 @@
       photosGallery.unshift(dataUrl);
       localStorage.setItem('phone_photos', JSON.stringify(photosGallery.slice(0, 18)));
 
-      // Visual flash feedback
       appView.style.opacity = '0.3';
       setTimeout(() => { appView.style.opacity = '1'; }, 100);
     }
 
-    // --- 2. Functional Photos App ---
     function openPhotosApp() {
       photosGallery = JSON.parse(localStorage.getItem('phone_photos') || '[]');
       let photosHtml = '<div class="gallery-grid">';
 
       if (photosGallery.length === 0) {
-        photosHtml = `<p style="color: var(--subtext-color); text-align: center; margin-top: 40px;">No photos yet. Open Camera to snap some!</p>`;
+        photosHtml = `<p style="color: var(--subtext-color); text-align: center; margin-top: 30px;">No photos yet. Open Camera to snap some!</p>`;
       } else {
         photosGallery.forEach(src => {
           photosHtml += `<img src="${src}" class="gallery-item" />`;
@@ -612,8 +571,7 @@
       openAppContainer('Photos', photosHtml);
     }
 
-    // --- 3. Functional Notes App ---
-    let notes = JSON.parse(localStorage.getItem('phone_notes') || '["Remember to water plants 🌱", "120Hz display refresh active"]');
+    let notes = JSON.parse(localStorage.getItem('phone_notes') || '["Remember to water plants 🌱"]');
 
     function openNotesApp() {
       renderNotes();
@@ -653,7 +611,6 @@
       renderNotes();
     }
 
-    // --- 4. Functional Settings App ---
     function openSettingsApp() {
       const html = `
         <div class="setting-group">
