@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Virtual Smartphone Simulator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: pan-y;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: #0f1115;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #fff;
+    }
+
+    /* Fixed Aspect Ratio Phone Shell */
+    .phone-wrapper {
+      width: 340px;
+      height: 680px;
+      background: #181a20;
+      border-radius: 44px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), inset 0 0 0 4px #2b2e38;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Status Bar & Notch */
+    .status-bar {
+      height: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 50;
+      position: relative;
+    }
+
+    .punch-hole {
+      position: absolute;
+      left: 50%;
+      top: 10px;
+      transform: translateX(-50%);
+      width: 14px;
+      height: 14px;
+      background: #000;
+      border-radius: 50%;
+    }
+
+    /* Viewport Area */
+    .viewport {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pages-slider {
+      display: flex;
+      width: 200%;
+      height: 100%;
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .page {
+      width: 50%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      position: relative;
+    }
+
+    /* Page 1: Home Screen */
+    .clock-widget {
+      text-align: center;
+      margin-top: 20px;
+      margin-bottom: 30px;
+    }
+    .clock-widget .time {
+      font-size: 48px;
+      font-weight: 300;
+      letter-spacing: -1px;
+    }
+    .clock-widget .date {
+      font-size: 14px;
+      color: #9aa0a6;
+      margin-top: 4px;
+    }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      padding: 10px;
+    }
+
+    .app-icon {
+      background: #232732;
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+      transition: transform 0.15s ease, background-color 0.2s;
+    }
+    .app-icon:active {
+      transform: scale(0.92);
+      background: #2d3240;
+    }
+    .app-icon .icon-emoji {
+      font-size: 32px;
+    }
+    .app-icon span {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    /* Page 2: Scrollable Feed */
+    .feed-container {
+      height: 100%;
+      overflow-y: auto;
+      padding-bottom: 40px;
+      touch-action: pan-y;
+    }
+    .feed-container::-webkit-scrollbar {
+      display: none;
+    }
+    .feed-card {
+      background: #232732;
+      padding: 16px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .feed-card h4 {
+      margin-bottom: 6px;
+      color: #60a5fa;
+    }
+
+    /* Pagination Dots */
+    .page-dots {
+      position: absolute;
+      bottom: 25px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      z-index: 10;
+    }
+    .dot {
+      width: 7px;
+      height: 7px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    .dot.active {
+      background: #fff;
+      width: 18px;
+      border-radius: 8px;
+    }
+
+    /* Open App Overlay Screen */
+    .app-view {
+      position: absolute;
+      inset: 0;
+      background: #181a20;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      padding: 50px 20px 20px;
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.1, 0.9, 0.2, 1);
+    }
+    .app-view.open {
+      transform: translateY(0);
+    }
+    .app-view-header {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .app-view-body {
+      flex: 1;
+      font-size: 14px;
+      color: #c4c7c5;
+    }
+
+    /* Bottom Home Indicator Bar (Swipe Up Area) */
+    .gesture-bar-area {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      cursor: pointer;
+    }
+    .gesture-bar {
+      width: 120px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 10px;
+      transition: transform 0.2s;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phone-wrapper" id="phoneWrapper">
+    <div class="punch-hole"></div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span id="statusClock">12:00</span>
+      <span>5G 📶 98%</span>
+    </div>
+
+    <!-- Main Swappable Pages -->
+    <div class="viewport" id="viewport">
+      <div class="pages-slider" id="slider">
+        
+        <!-- Page 1: Home -->
+        <div class="page" id="pageHome">
+          <div class="clock-widget">
+            <div class="time" id="homeClock">12:00</div>
+            <div class="date" id="homeDate">Wednesday, Oct 24</div>
+          </div>
+
+          <div class="app-grid">
+            <div class="app-icon" onclick="openApp('Camera', '📸 Camera sensor active. Tap or swipe up the bar below to return home.')">
+              <span class="icon-emoji">📷</span>
+              <span>Camera</span>
+            </div>
+            <div class="app-icon" onclick="openApp('Photos', '🖼️ Recent gallery memories are loaded.')">
+              <span class="icon-emoji">🖼️</span>
+              <span>Photos</span>
+            </div>
+            <div class="app-icon" onclick="openApp('Notes', '📝 Quick reminder: 120Hz smooth swipes feel like butter!')">
+              <span class="icon-emoji">📝</span>
+              <span>Notes</span>
+            </div>
+            <div class="app-icon" onclick="openApp('Settings', '⚙️ Display Refresh Rate: [ 30Hz | 60Hz | 120Hz Active ]')">
+              <span class="icon-emoji">⚙️</span>
+              <span>Settings</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Page 2: News / Scrollable Feed -->
+        <div class="page" id="pageFeed">
+          <div class="feed-container" id="feedScroll">
+            <h3 style="margin-bottom: 12px;">News Feed</h3>
+            <div class="feed-card">
+              <h4>🔥 High Refresh Rates</h4>
+              Why 30fps feels choppy once your eyes adjust to 120Hz scrolling physics.
+            </div>
+            <div class="feed-card">
+              <h4>📱 Touch Inertia</h4>
+              Vertical scrolling works naturally using native touch momentum.
+            </div>
+            <div class="feed-card">
+              <h4>⚡ Swipe Navigation</h4>
+              Swipe right anywhere on this screen to flip back to Home!
+            </div>
+            <div class="feed-card">
+              <h4>✨ Extra Card</h4>
+              Keep scrolling down to test touch scroll bounds.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="page-dots">
+        <div class="dot active" id="dot0"></div>
+        <div class="dot" id="dot1"></div>
+      </div>
+    </div>
+
+    <!-- Active App Card Modal -->
+    <div class="app-view" id="appView">
+      <div class="app-view-header" id="appTitle">App Name</div>
+      <div class="app-view-body" id="appContent">App content goes here...</div>
+    </div>
+
+    <!-- Swipe Up / Tap Gesture Bar -->
+    <div class="gesture-bar-area" id="homeGestureBar">
+      <div class="gesture-bar"></div>
+    </div>
+  </div>
+
+  <script>
+    // Realtime Clock Updater
+    function updateClocks() {
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const timeStr = `${hours % 12 || 12}:${minutes}`;
+      document.getElementById('statusClock').textContent = timeStr;
+      document.getElementById('homeClock').textContent = timeStr;
+
+      const options = { weekday: 'short', month: 'short', day: 'numeric' };
+      document.getElementById('homeDate').textContent = now.toLocaleDateString(undefined, options);
+    }
+    updateClocks();
+    setInterval(updateClocks, 1000);
+
+    // Page Slider Navigation
+    let currentPage = 0;
+    const slider = document.getElementById('slider');
+    const dot0 = document.getElementById('dot0');
+    const dot1 = document.getElementById('dot1');
+
+    function goToPage(page) {
+      currentPage = page;
+      slider.style.transform = `translateX(-${page * 50}%)`;
+      if (page === 0) {
+        dot0.classList.add('active');
+        dot1.classList.remove('active');
+      } else {
+        dot1.classList.add('active');
+        dot0.classList.remove('active');
+      }
+    }
+
+    // Horizontal Touch Swiping between Pages
+    let touchStartX = 0;
+    let touchStartY = 0;
+    const viewport = document.getElementById('viewport');
+
+    viewport.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    viewport.addEventListener('touchend', (e) => {
+      const diffX = touchStartX - e.changedTouches[0].clientX;
+      const diffY = touchStartY - e.changedTouches[0].clientY;
+
+      // Only trigger horizontal page swipe if horizontal drag > vertical scroll
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+        if (diffX > 0 && currentPage === 0) goToPage(1); // Swipe Left
+        else if (diffX < 0 && currentPage === 1) goToPage(0); // Swipe Right
+      }
+    });
+
+    // App View Open / Close
+    const appView = document.getElementById('appView');
+    const appTitle = document.getElementById('appTitle');
+    const appContent = document.getElementById('appContent');
+    let isAppOpen = false;
+
+    function openApp(name, content) {
+      appTitle.textContent = name;
+      appContent.textContent = content;
+      appView.classList.add('open');
+      isAppOpen = true;
+    }
+
+    function closeAppToHome() {
+      if (isAppOpen) {
+        appView.classList.remove('open');
+        isAppOpen = false;
+      }
+    }
+
+    // Gesture Bar: Tap or Swipe-Up to Go Home
+    const gestureBar = document.getElementById('homeGestureBar');
+    let barStartY = 0;
+
+    gestureBar.addEventListener('click', closeAppToHome);
+
+    gestureBar.addEventListener('touchstart', (e) => {
+      barStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    gestureBar.addEventListener('touchend', (e) => {
+      const diffY = barStartY - e.changedTouches[0].clientY;
+      if (diffY > 20) { // Dragged up
+        closeAppToHome();
+      }
+    });
+
+    // Also let users swipe up anywhere from inside the open app
+    appView.addEventListener('touchstart', (e) => {
+      barStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    appView.addEventListener('touchend', (e) => {
+      const diffY = barStartY - e.changedTouches[0].clientY;
+      if (diffY > 60) { // Upward flick inside app
+        closeAppToHome();
+      }
+    });
+  </script>
+</body>
+</html>
