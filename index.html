@@ -233,10 +233,27 @@
     }
     .camera-controls {
       display: flex;
-      justify-content: center;
+      justify-content: space-around;
       align-items: center;
-      padding: 12px 0 0;
+      padding: 14px 20px 0;
       flex-shrink: 0;
+    }
+    .flip-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .flip-btn:active {
+      transform: rotate(180deg) scale(0.9);
     }
     .shutter-btn {
       width: 60px;
@@ -396,8 +413,8 @@
               All device modules and full viewport bounds are operational.
             </div>
             <div class="feed-card">
-              <h4>📸 Live Camera</h4>
-              Snap photos with native screen fitting.
+              <h4>📸 Dual Camera Active</h4>
+              Switch between front selfie and rear lenses seamlessly.
             </div>
             <div class="feed-card">
               <h4>📝 Storage Persistent</h4>
@@ -482,6 +499,7 @@
     const appContent = document.getElementById('appContent');
     let isAppOpen = false;
     let cameraStream = null;
+    let currentFacingMode = "user"; // "user" (front) or "environment" (back)
 
     function openAppContainer(title, htmlContent) {
       appTitle.textContent = title;
@@ -511,30 +529,57 @@
 
     let photosGallery = JSON.parse(localStorage.getItem('phone_photos') || '[]');
 
+    async function startCameraStream() {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+      }
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { exact: currentFacingMode } },
+          audio: false
+        });
+        const video = document.getElementById('cameraVideo');
+        if (video) video.srcObject = cameraStream;
+      } catch (err) {
+        // Fallback without exact constraint if device only has one camera
+        try {
+          cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: currentFacingMode },
+            audio: false
+          });
+          const video = document.getElementById('cameraVideo');
+          if (video) video.srcObject = cameraStream;
+        } catch (error) {
+          const content = document.getElementById('appContent');
+          if (content) {
+            content.innerHTML = `
+              <div style="text-align:center; margin-top: 30px; color:#ef4444;">
+                <p>📷 Camera sensor not available.</p>
+              </div>
+            `;
+          }
+        }
+      }
+    }
+
+    function toggleCameraFacing() {
+      currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
+      startCameraStream();
+    }
+
     async function openCameraApp() {
       const html = `
         <div class="camera-box">
           <video id="cameraVideo" autoplay playsinline></video>
         </div>
         <div class="camera-controls">
+          <button class="flip-btn" onclick="toggleCameraFacing()" title="Flip Camera">🔄</button>
           <button class="shutter-btn" onclick="capturePhoto()"></button>
+          <div style="width: 48px;"></div>
         </div>
       `;
       openAppContainer('Camera', html);
-
-      try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "user" },
-          audio: false
-        });
-        document.getElementById('cameraVideo').srcObject = cameraStream;
-      } catch (err) {
-        document.getElementById('appContent').innerHTML = `
-          <div style="text-align:center; margin-top: 30px; color:#ef4444;">
-            <p>📷 Camera access not granted or unavailable.</p>
-          </div>
-        `;
-      }
+      startCameraStream();
     }
 
     function capturePhoto() {
