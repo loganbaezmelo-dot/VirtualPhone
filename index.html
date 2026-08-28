@@ -112,15 +112,15 @@
 
     .app-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
       width: 100%;
     }
 
     .app-icon {
       background: var(--card-bg);
-      border-radius: 20px;
-      padding: 16px 8px;
+      border-radius: 18px;
+      padding: 14px 6px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -133,10 +133,10 @@
       transform: scale(0.95);
     }
     .app-icon .icon-emoji {
-      font-size: 30px;
+      font-size: 28px;
     }
     .app-icon span {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
     }
 
@@ -213,7 +213,66 @@
       overflow-y: auto;
     }
 
-    /* Camera View Adjustments */
+    /* --- Browser App Styles --- */
+    .browser-bar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-shrink: 0;
+    }
+    .browser-nav-btn {
+      background: var(--card-bg);
+      border: none;
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .browser-url-input {
+      flex: 1;
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      outline: none;
+    }
+    .browser-bookmarks {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+      overflow-x: auto;
+      flex-shrink: 0;
+      padding-bottom: 4px;
+    }
+    .bookmark-chip {
+      background: var(--card-bg);
+      color: var(--accent-color);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      white-space: nowrap;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .browser-frame-container {
+      flex: 1;
+      width: 100%;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+    .browser-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Camera View */
     .camera-box {
       flex: 1;
       width: 100%;
@@ -250,10 +309,6 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .flip-btn:active {
-      transform: rotate(180deg) scale(0.9);
     }
     .shutter-btn {
       width: 60px;
@@ -263,7 +318,6 @@
       border: 4px solid rgba(255, 255, 255, 0.4);
       cursor: pointer;
     }
-    .shutter-btn:active { transform: scale(0.9); }
 
     /* Gallery */
     .gallery-grid {
@@ -377,6 +431,7 @@
     <div class="viewport" id="viewport">
       <div class="pages-slider" id="slider">
         
+        <!-- Home Screen -->
         <div class="page" id="pageHome">
           <div class="clock-widget">
             <div class="time" id="homeClock">12:00</div>
@@ -384,6 +439,10 @@
           </div>
 
           <div class="app-grid">
+            <div class="app-icon" onclick="openBrowserApp()">
+              <span class="icon-emoji">🌐</span>
+              <span>Browser</span>
+            </div>
             <div class="app-icon" onclick="openCameraApp()">
               <span class="icon-emoji">📷</span>
               <span>Camera</span>
@@ -403,20 +462,21 @@
           </div>
         </div>
 
+        <!-- Feed Screen -->
         <div class="page" id="pageFeed">
           <div class="feed-container">
             <h3 style="margin-bottom: 12px;">News Feed</h3>
             <div class="feed-card">
-              <h4>🔥 Hardware Status</h4>
-              All device modules and battery power systems are operational.
+              <h4>🌐 Full Web Browser Active</h4>
+              Search or visit live web pages inside the virtual OS.
             </div>
             <div class="feed-card">
-              <h4>📸 Dual Camera Active</h4>
-              Switch between front selfie and rear lenses seamlessly.
+              <h4>📸 Dual Camera</h4>
+              Switch lenses, take snaps and save them to local storage.
             </div>
             <div class="feed-card">
-              <h4>📝 Storage Persistent</h4>
-              Notes and gallery are stored locally.
+              <h4>⚡ Smooth OS Navigation</h4>
+              Realtime battery drain and responsive viewport physics.
             </div>
           </div>
         </div>
@@ -429,6 +489,7 @@
       </div>
     </div>
 
+    <!-- Active App Modal -->
     <div class="app-view" id="appView">
       <div class="app-header" id="appTitle">App Name</div>
       <div class="app-content" id="appContent"></div>
@@ -456,27 +517,25 @@
     updateClocks();
     setInterval(updateClocks, 1000);
 
-    // --- Dynamic Battery Drain System ---
+    // Battery Drain
     let batteryLevel = parseInt(localStorage.getItem('phone_battery') || '100', 10);
 
     function updateBatteryDisplay() {
       const batEl = document.getElementById('statusBattery');
       if (batteryLevel <= 10) {
         batEl.textContent = `🪫 ${batteryLevel}%`;
-        batEl.style.color = '#ef4444'; // Red
+        batEl.style.color = '#ef4444';
       } else if (batteryLevel <= 20) {
         batEl.textContent = `🪫 ${batteryLevel}%`;
-        batEl.style.color = '#f59e0b'; // Yellow
+        batEl.style.color = '#f59e0b';
       } else {
         batEl.textContent = `5G 📶 ${batteryLevel}%`;
         batEl.style.color = '#fff';
       }
       localStorage.setItem('phone_battery', batteryLevel.toString());
     }
-
     updateBatteryDisplay();
 
-    // Drains 1% every 25 seconds
     setInterval(() => {
       if (batteryLevel > 1) {
         batteryLevel--;
@@ -484,6 +543,7 @@
       }
     }, 25000);
 
+    // Navigation
     let currentPage = 0;
     const slider = document.getElementById('slider');
     const dot0 = document.getElementById('dot0');
@@ -552,8 +612,59 @@
       if (barStartY - e.changedTouches[0].clientY > 20) closeAppToHome();
     });
 
-    let photosGallery = JSON.parse(localStorage.getItem('phone_photos') || '[]');
+    // --- Functional Browser App ---
+    function openBrowserApp() {
+      const html = `
+        <div class="browser-bar">
+          <button class="browser-nav-btn" onclick="browserReload()">🔄</button>
+          <input type="text" id="browserUrl" class="browser-url-input" placeholder="Search or type URL..." value="https://en.m.wikipedia.org" onkeydown="if(event.key==='Enter') navigateBrowser()" />
+          <button class="browser-nav-btn" onclick="navigateBrowser()">Go</button>
+        </div>
+        <div class="browser-bookmarks">
+          <span class="bookmark-chip" onclick="loadBookmark('https://en.m.wikipedia.org')">Wikipedia</span>
+          <span class="bookmark-chip" onclick="loadBookmark('https://html.duckduckgo.com/html')">DuckDuckGo</span>
+          <span class="bookmark-chip" onclick="loadBookmark('https://news.ycombinator.com')">HackerNews</span>
+          <span class="bookmark-chip" onclick="loadBookmark('https://archive.org')">Archive</span>
+        </div>
+        <div class="browser-frame-container">
+          <iframe id="browserIframe" class="browser-iframe" src="https://en.m.wikipedia.org" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+        </div>
+      `;
+      openAppContainer('Browser', html);
+    }
 
+    function navigateBrowser() {
+      const input = document.getElementById('browserUrl');
+      const iframe = document.getElementById('browserIframe');
+      if (!input || !iframe) return;
+
+      let val = input.value.trim();
+      if (!val.startsWith('http://') && !val.startsWith('https://')) {
+        if (val.includes('.') && !val.includes(' ')) {
+          val = 'https://' + val;
+        } else {
+          val = 'https://html.duckduckgo.com/html/?q=' + encodeURIComponent(val);
+        }
+      }
+      input.value = val;
+      iframe.src = val;
+    }
+
+    function loadBookmark(url) {
+      const input = document.getElementById('browserUrl');
+      const iframe = document.getElementById('browserIframe');
+      if (input && iframe) {
+        input.value = url;
+        iframe.src = url;
+      }
+    }
+
+    function browserReload() {
+      const iframe = document.getElementById('browserIframe');
+      if (iframe) iframe.src = iframe.src;
+    }
+
+    // --- Camera App ---
     async function startCameraStream() {
       if (cameraStream) {
         cameraStream.getTracks().forEach(track => track.stop());
@@ -576,11 +687,7 @@
         } catch (error) {
           const content = document.getElementById('appContent');
           if (content) {
-            content.innerHTML = `
-              <div style="text-align:center; margin-top: 30px; color:#ef4444;">
-                <p>📷 Camera sensor not available.</p>
-              </div>
-            `;
+            content.innerHTML = `<div style="text-align:center; margin-top: 30px; color:#ef4444;"><p>📷 Camera sensor not available.</p></div>`;
           }
         }
       }
@@ -606,6 +713,8 @@
       startCameraStream();
     }
 
+    let photosGallery = JSON.parse(localStorage.getItem('phone_photos') || '[]');
+
     function capturePhoto() {
       const video = document.getElementById('cameraVideo');
       const canvas = document.getElementById('photoCanvas');
@@ -624,6 +733,7 @@
       setTimeout(() => { appView.style.opacity = '1'; }, 100);
     }
 
+    // --- Photos App ---
     function openPhotosApp() {
       photosGallery = JSON.parse(localStorage.getItem('phone_photos') || '[]');
       let photosHtml = '<div class="gallery-grid">';
@@ -640,6 +750,7 @@
       openAppContainer('Photos', photosHtml);
     }
 
+    // --- Notes App ---
     let notes = JSON.parse(localStorage.getItem('phone_notes') || '["Remember to water plants 🌱"]');
 
     function openNotesApp() {
@@ -680,6 +791,7 @@
       renderNotes();
     }
 
+    // --- Settings App ---
     function openSettingsApp() {
       const html = `
         <div class="setting-group">
